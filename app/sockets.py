@@ -144,6 +144,37 @@ async def join_room(sid, data):
 
 
 @sio.event
+async def leave_room(sid, data):
+    """
+    Leave a chat room.
+    Payload: {"room_id": "..."}
+    """
+    # Parse JSON string to dict
+    if isinstance(data, str):
+        try:
+            data = json.loads(data)
+        except json.JSONDecodeError:
+            data = {}
+
+    room_id = data.get("room_id") if isinstance(data, dict) else None
+    username = sid_to_username.get(sid)
+
+    if not username:
+        await sio.emit("error", {"message": "Not authenticated"}, to=sid)
+        return
+    if not room_id:
+        await sio.emit("error", {"message": "room_id is required"}, to=sid)
+        return
+
+    # Leave the Socket.IO room
+    await sio.leave_room(sid, room_id)
+    print(f"User '{username}' left room {room_id}")
+
+    # Notify the user they successfully left
+    await sio.emit("left_room", {"room_id": room_id}, to=sid)
+
+
+@sio.event
 async def send_message(sid, data):
     """
     Send a message to a room.
