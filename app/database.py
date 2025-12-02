@@ -4,6 +4,7 @@ MongoDB connection module using motor async driver.
 
 import os
 
+import certifi
 from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 from typing import Optional
@@ -22,7 +23,8 @@ db = None
 async def connect_to_mongo():
     """Initialize MongoDB connection."""
     global client, db
-    client = AsyncIOMotorClient(MONGO_URL)
+    # Use certifi for SSL certificates (required for MongoDB Atlas on some platforms)
+    client = AsyncIOMotorClient(MONGO_URL, tlsCAFile=certifi.where())
     db = client[DATABASE_NAME]
 
     # Create indexes for better query performance
