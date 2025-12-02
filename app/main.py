@@ -38,10 +38,16 @@ app.include_router(rooms.router)
 app.include_router(messages.router)
 
 
-# Health check endpoint
+# Health check endpoints
+@app.get("/")
+async def root():
+    """Root endpoint for Render health check."""
+    return {"status": "ok"}
+
+
 @app.get("/health")
 async def health_check():
-    """Simple health check endpoint."""
+    """Health check endpoint."""
     return {"status": "ok"}
 
 
